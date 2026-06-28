@@ -108,9 +108,11 @@ void deposit()
 void displayBalance()
 {
     int acc_no, found = 0;
+    char header[100];
     struct Customer c;
     FILE *fp;
     fp = openFile(BANK_FILE, "r");
+    fgets(header, sizeof(header), fp);
     printf("Enter your account number:\n");
     scanf("%d", &acc_no);
     while (fscanf(fp, "%d %s %s %s %ld %d", &c.acc_no, c.fname, c.lname, c.dob, &c.mob_no, &c.balance) == TOTAL_FIELDS)
@@ -193,7 +195,7 @@ void transfer()
     {
         printf("Receiver account not found\n");
     }
-    else if (!flag)
+    else if (flag)
     {
         printf("Insuffient balance\n");
     }
@@ -235,28 +237,35 @@ void withdraw()
 
         fprintf(temp, "%d %s %s %s %ld %d\n", c.acc_no, c.fname, c.lname, c.dob, c.mob_no, c.balance);
     }
-    if (accFound)
+    if (!accFound)
     {
         printf("Account not found\n");
     }
     fclose(fp);
     fclose(temp);
     updateFile(insufficientBalance == 1 && accFound == 1);
-    printf("Transaction completed successfully!");
+    if (accFound && insufficientBalance)
+    {
+        printf("Transaction completed successfully!");
+    }
 }
 int main()
 {
-    int choice;
+    int choice, showMenu = 1;
+    char ch;
     srand(time(NULL));
     while (1)
     {
+        if (showMenu)
+        {
+            printf("1. Create new account\n");
+            printf("2. Deposit amount\n");
+            printf("3. Withdraw Amount\n");
+            printf("4.Check balance\n");
+            printf("5.Money transfer\n");
+            printf("6.Exit\n");
+        }
 
-        printf("1. Create new account\n");
-        printf("2. Deposit amount\n");
-        printf("3. Withdraw Amount\n");
-        printf("4.Check balance\n");
-        printf("5.Money transfer\n");
-        printf("6.Exit\n");
         printf("Enter your choice :\n");
         scanf("%d", &choice);
         switch (choice)
@@ -278,6 +287,17 @@ int main()
             break;
         case 6:
             exit(0);
+        }
+
+        printf("\n Do you want to Continue? (Y/N) :");
+        scanf(" %c", &ch);
+        if (ch == 'Y' || ch == 'y')
+        {
+            showMenu = 1;
+        }
+        else
+        {
+            break;
         }
     }
 
